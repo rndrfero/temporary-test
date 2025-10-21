@@ -1,4 +1,5 @@
 import type { Order } from "~/types/order";
+import type { OrderFetchOptions } from "~/types/orderFetchOptions";
 
 // Base API configuration
 const API_BASE_URL = "http://localhost:3001";
@@ -36,11 +37,19 @@ async function apiFetch(
 
 // Order-specific API methods
 export const orderApi = {
-  async getOrders(
+  async getOrders({
     page = 1,
-    limit = 10
-  ): Promise<{ orders: Order[]; totalCount: number }> {
-    const response = await apiFetch(`/orders?_page=${page}&_limit=${limit}`);
+    itemsPerPage = 10,
+    sortBy,
+  }: OrderFetchOptions = {}): Promise<{ orders: Order[]; totalCount: number }> {
+    let url = `/orders?_page=${page}&_limit=${itemsPerPage}`;
+
+    // Add sorting parameters if provided
+    if (sortBy?.[0]) {
+      url += `&_sort=${sortBy[0].key}&_order=${sortBy[0].order}`;
+    }
+
+    const response = await apiFetch(url);
     const totalCount = parseInt(
       response.headers.get("x-total-count") || "0",
       10

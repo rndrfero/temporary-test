@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { Order } from "~/types/order";
+import type { OrderFetchOptions } from "~/types/orderFetchOptions";
 import { orderApi } from "~/services/orderApi";
 import { useAsyncState } from "~/composables/useAsyncState";
 
@@ -12,9 +13,9 @@ export const useOrderCollectionStore = defineStore("orderCollection", () => {
   const { loading, error, withLoadingAndError } = useAsyncState();
 
   // Actions
-  async function fetchOrders(page = 1, limit = 10) {
+  async function fetchOrders(options: OrderFetchOptions = {}) {
     return withLoadingAndError(async () => {
-      const result = await orderApi.getOrders(page, limit);
+      const result = await orderApi.getOrders(options);
       orders.value = result.orders;
       totalCount.value = result.totalCount;
     });

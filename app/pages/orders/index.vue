@@ -55,14 +55,15 @@ import { useOrderCollectionStore } from "~/stores/orderCollectionStore";
 interface DataTableOptions {
   page: number;
   itemsPerPage: number;
+  sortBy?: Array<{ key: string; order: "asc" | "desc" }>;
 }
 
 const orderStore = useOrderCollectionStore();
 
 const headers = [
-  { title: "Order Number", key: "number" },
-  { title: "Customer Name", key: "customerName" },
-  { title: "Date", key: "date" },
+  { title: "Order Number", key: "number", sortable: true },
+  { title: "Customer Name", key: "customerName", sortable: true },
+  { title: "Date", key: "date", sortable: true },
   { title: "Waypoints", key: "waypoints", sortable: false },
   { title: "Actions", key: "actions", sortable: false },
 ];
@@ -74,17 +75,14 @@ const currentOptions = ref<DataTableOptions>({
 
 const loadOrders = (options: DataTableOptions) => {
   currentOptions.value = options;
-  orderStore.fetchOrders(options.page, options.itemsPerPage);
+  orderStore.fetchOrders(options);
 };
 
 const deleteOrder = async (id: number) => {
   if (confirm("Delete this order?")) {
     await orderStore.deleteOrder(id);
-    // Refresh to maintain correct pagination/count
-    orderStore.fetchOrders(
-      currentOptions.value.page,
-      currentOptions.value.itemsPerPage
-    );
+    // Refresh to maintain correct pagination/count/sorting
+    orderStore.fetchOrders(currentOptions.value);
   }
 };
 
