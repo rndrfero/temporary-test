@@ -1,95 +1,162 @@
-# Nuxt Minimal Starter
+# Transport Management System
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Frontend for managing transport orders and waypoints.
+
+## Tech Stack
+
+- **Vue 3** with TypeScript and Composition API
+- **Nuxt 4** for framework and routing
+- **Vuetify** for UI components
+- **Pinia** for state management
+- **json-server** for mock API
 
 ## Setup
 
-Make sure to install dependencies:
+Install dependencies:
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+## Running the App
 
-Start the development server on `http://localhost:3000`:
+Start both frontend and mock API:
 
 ```bash
-# npm
+npm run dev:all
+```
+
+Or run separately:
+
+```bash
+# Frontend only (http://localhost:3000)
 npm run dev
 
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
+# Mock API only (http://localhost:3001)
+npm run json-server
 ```
 
-## Production
+## Features
 
-Build the application for production:
+### Core Features
+
+- Create transport orders with order number, customer name, and date
+- Add multiple waypoints per order (address + type)
+- List all orders with waypoint count
+- Filter orders by date and customer name
+
+### Bonus Features
+
+- Update and delete orders
+- Pagination for order listing
+- Client-side form validation
+
+## Mock API
+
+Using **json-server** with `db.json`.
+
+API endpoint is hardcoded as `API_BASE_URL` in `app/services/orderApi.ts` (defaults to `http://localhost:3001`).
+
+### API Endpoints
+
+```
+GET    /orders                 # List all orders (paginated server-side)
+GET    /orders/:id             # Get single order
+POST   /orders                 # Create order
+PUT    /orders/:id             # Update order
+DELETE /orders/:id             # Delete order
+```
+
+**Note**: Waypoints are nested within orders. Orders support server-side pagination and sorting via `_page`, `_limit`, and `_sort` query parameters.
+
+### Sample Data
+
+The `db.json` file includes sample orders.
+
+Each order has pickup and delivery waypoints with addresses.
+
+Mock data is stored in `db.json`. Use `db.json.example` as a template and add `db.json` to `.gitignore`.
+
+## Architecture Decisions
+
+### Clean Architecture
+
+- **Services layer**: API communication (`orderApi.ts`)
+- **Stores**: State management with Pinia
+  - `orderCollectionStore`: Manages order list and filtering
+  - `orderRecordStore`: Manages single order CRUD
+- **Composables**: Reusable logic
+  - `useAsyncState`: Async operation state handling
+  - `useValidationRules`: Form validation rules
+- **Components**: Presentational and form components
+  - `OrderForm`: Order creation/editing
+  - `WaypointForm`: Waypoint input
+  - `WaypointsTable`: Waypoint display
+
+### Design Choices
+
+- Embedded waypoints in order POST (single transaction)
+- Optimistic UI updates for better UX
+- Client-side filtering for performance
+- Vuetify for rapid, consistent UI development
+
+### Data Model
+
+**Order**:
+
+```typescript
+{
+  id: number
+  number: string        // unique order number
+  customerName: string
+  date: string         // ISO format
+  waypoints: Waypoint[]
+}
+```
+
+**Waypoint**:
+
+```typescript
+{
+  id: number;
+  orderId: number;
+  address: string;
+  type: "Pickup" | "Delivery";
+}
+```
+
+## Project Structure
+
+```
+app/
+├── components/       # Vue components
+├── composables/      # Reusable composition functions
+├── pages/           # Nuxt pages/routes
+├── services/        # API service layer
+├── stores/          # Pinia stores
+└── types/           # TypeScript types
+```
+
+## Assumptions
+
+- Order numbers are unique but not auto-generated
+- Orders can have zero waypoints
+- Single-user application (no concurrent editing)
+
+## Features Not Implemented
+
+- Unique order number validation against the API (assumes backend handles validation and returns error on duplicate)
+
+## Production Build
+
+Build the app:
 
 ```bash
-# npm
 npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+Preview production build:
 
 ```bash
-# npm
 npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
-
----
-
-The structure follows json-server conventions, so when you query an order with \_embed=waypoints, it will automatically include the related waypoints. You can also query waypoints directly at /waypoints or filter by order like /waypoints?orderId=2.
-
-```
-GET    /orders                    # List all orders
-GET    /orders/:orderId           # Get single order (with embedded waypoints)
-POST   /orders                    # Create order (optionally with waypoints)
-PUT    /orders/:orderId           # Update order
-PATCH  /orders/:orderId           # Partial update order
-DELETE /orders/:orderId           # Delete order (cascade delete waypoints)
-
-GET    /orders/:orderId/waypoints              # List waypoints for an order
-GET    /orders/:orderId/waypoints/:waypointId  # Get single waypoint
-POST   /orders/:orderId/waypoints              # Create waypoint for order
-PUT    /orders/:orderId/waypoints/:waypointId  # Update waypoint
-PATCH  /orders/:orderId/waypoints/:waypointId  # Partial update waypoint
-DELETE /orders/:orderId/waypoints/:waypointId  # Delete waypoint
 ```
