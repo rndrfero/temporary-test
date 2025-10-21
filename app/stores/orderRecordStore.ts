@@ -64,31 +64,14 @@ export const useOrderRecordStore = defineStore("orderRecord", {
 
     // Waypoint manipulation (in-memory, works on this.order)
     addWaypoint(waypoint: Omit<Waypoint, "id" | "orderId">) {
-      if (!this.order) return;
-
-      if (!this.order.waypoints) {
-        this.order.waypoints = [];
-      }
-
-      const maxId =
-        this.order.waypoints.length > 0
-          ? Math.max(...this.order.waypoints.map((w) => w.id || 0))
-          : 0;
-
-      const newWaypoint: Waypoint = {
-        id: maxId + 1,
-        orderId: this.order.id || 0,
+      this.order!.waypoints.push({
         ...waypoint,
-      };
-
-      this.order.waypoints.push(waypoint);
+        orderId: this.order!.id,
+      });
     },
 
-    removeWaypoint(waypointId: number) {
-      if (!this.order || !this.order.waypoints) return;
-      this.order.waypoints = this.order.waypoints.filter(
-        (w) => w.id !== waypointId
-      );
+    removeWaypointAtIndex(index: number) {
+      this.order!.waypoints.splice(index, 1);
     },
 
     initializeOrder(orderData?: Partial<Order>) {

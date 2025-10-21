@@ -91,8 +91,8 @@ const handleAddWaypoint = (waypoint: Omit<Waypoint, "id" | "orderId">) => {
   orderStore.addWaypoint(waypoint);
 };
 
-const handleRemoveWaypoint = (waypointId: number) => {
-  orderStore.removeWaypoint(waypointId);
+const handleRemoveWaypoint = (index: number) => {
+  orderStore.removeWaypointAtIndex(index);
 };
 
 const handleSubmit = async () => {

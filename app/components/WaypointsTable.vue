@@ -20,14 +20,13 @@
       </v-chip>
     </template>
 
-    <template #[`item.actions`]="{ item }">
+    <template #[`item.actions`]="{ index }">
       <v-btn
-        v-if="item.id"
         icon="mdi-delete"
         size="small"
         variant="text"
         color="error"
-        @click="$emit('remove', item.id)"
+        @click="$emit('remove', index)"
       />
     </template>
 
@@ -51,7 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  remove: [waypointId: number];
+  remove: [index: number];
 }>();
 
 const headers = [
