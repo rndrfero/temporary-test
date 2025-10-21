@@ -5,6 +5,15 @@ const API_BASE_URL = "http://localhost:3001";
 
 // Generic API client with error handling
 async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const response = await apiFetch(endpoint, options);
+  return await response.json();
+}
+
+// Lower-level fetch wrapper that returns the response for header access
+async function apiFetch(
+  endpoint: string,
+  options?: RequestInit
+): Promise<Response> {
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
@@ -18,7 +27,7 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
       throw new Error(`API Error: ${response.statusText}`);
     }
 
-    return await response.json();
+    return response;
   } catch (error) {
     console.error("API call failed:", endpoint, error);
     throw error;
@@ -27,16 +36,15 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
 // Order-specific API methods
 export const orderApi = {
-  async getOrders(page = 1, limit = 10) {
-    const response = await fetch(
-      `${API_BASE_URL}/orders?_page=${page}&_limit=${limit}`
+  async getOrders(
+    page = 1,
+    limit = 10
+  ): Promise<{ orders: Order[]; totalCount: number }> {
+    const response = await apiFetch(`/orders?_page=${page}&_limit=${limit}`);
+    const totalCount = parseInt(
+      response.headers.get("x-total-count") || "0",
+      10
     );
-
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-
-    const totalCount = parseInt(response.headers.get("x-total-count") || "0");
     const orders = await response.json();
     return { orders, totalCount };
   },
