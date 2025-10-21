@@ -95,58 +95,6 @@
       ]
     },
     {
-      "id": 5,
-      "number": "ORD-2025-005",
-      "customerName": "Future Systems",
-      "date": "2025-10-19",
-      "waypoints": [
-        {
-          "id": 10,
-          "orderId": 5,
-          "address": "741 Ash Ct, Houston, TX 77001",
-          "type": "Pickup"
-        },
-        {
-          "id": 11,
-          "orderId": 5,
-          "address": "852 Willow Way, Sugar Land, TX 77478",
-          "type": "Delivery"
-        },
-        {
-          "id": 12,
-          "orderId": 5,
-          "address": "963 Cherry Pl, Pearland, TX 77581",
-          "type": "Delivery"
-        }
-      ]
-    },
-    {
-      "id": 6,
-      "number": "ORD-2025-006",
-      "customerName": "Digital Ventures",
-      "date": "2025-10-20",
-      "waypoints": [
-        {
-          "id": 13,
-          "orderId": 6,
-          "address": "159 Poplar Rd, Phoenix, AZ 85001",
-          "type": "Pickup"
-        },
-        {
-          "id": 14,
-          "orderId": 6,
-          "address": "357 Cypress St, Scottsdale, AZ 85251",
-          "type": "Delivery"
-        },
-        {
-          "id": 15,
-          "orderId": 6,
-          "address": "753 Magnolia Dr, Tempe, AZ 85281",
-          "type": "Delivery"
-        }
-      ]
-    },
-    {
       "id": 7,
       "number": "ORD-2025-007",
       "customerName": "Smart Industries",

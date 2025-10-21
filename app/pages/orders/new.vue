@@ -19,7 +19,6 @@
 </template>
 
 <script setup lang="ts">
-import moment from "moment";
 import { useOrderRecordStore } from "~/stores/orderRecordStore";
 import type { Order } from "~/types/order";
 import OrderForm from "~/components/OrderForm.vue";
@@ -32,7 +31,7 @@ onMounted(() => {
   orderStore.initializeOrder({
     number: "",
     customerName: "",
-    date: moment().format("YYYY-MM-DD"),
+    date: new Date().toISOString().split("T")[0],
     waypoints: [],
   });
 });

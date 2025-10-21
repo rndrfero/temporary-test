@@ -50,7 +50,6 @@
 </template>
 
 <script setup lang="ts">
-import moment from "moment";
 import { useOrderCollectionStore } from "~/stores/orderCollectionStore";
 
 const orderStore = useOrderCollectionStore();
@@ -83,5 +82,11 @@ const deleteOrder = async (id: number) => {
   }
 };
 
-const formatDate = (date: string) => moment(date).format("MMM DD, YYYY");
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+};
 </script>
