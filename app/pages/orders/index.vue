@@ -29,6 +29,9 @@
       <template #item.date="{ item }">
         {{ formatDate(item.date) }}
       </template>
+      <template #item.waypoints="{ item }">
+        {{ item.waypoints.length }}
+      </template>
       <template #item.actions="{ item }">
         <v-btn
           size="small"
@@ -56,6 +59,7 @@ const headers = [
   { title: "Order Number", key: "number" },
   { title: "Customer Name", key: "customerName" },
   { title: "Date", key: "date" },
+  { title: "Waypoints", key: "waypoints", sortable: false },
   { title: "Actions", key: "actions", sortable: false },
 ];
 

@@ -63,7 +63,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  submit: [data: { number: string; customerName: string; date: string }];
+  submit: [data: Partial<Order>];
   cancel: [];
 }>();
 

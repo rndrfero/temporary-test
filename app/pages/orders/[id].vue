@@ -20,13 +20,28 @@
       @submit="handleSubmit"
       @cancel="handleCancel"
     />
+
+    <v-row v-if="order" class="mt-6">
+      <v-col>
+        <WaypointForm @submit="handleAddWaypoint" />
+      </v-col>
+    </v-row>
+
+    <v-row v-if="order" class="mt-4">
+      <v-col>
+        <WaypointsTable :order="order" @remove="handleRemoveWaypoint" />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { useOrderStore } from "~/stores/orderStore";
-import type { UpdateOrderDto, Order } from "~/types/order";
+import type { Order } from "~/types/order";
+import type { Waypoint } from "~/types/waypoint";
 import OrderForm from "~/components/OrderForm.vue";
+import WaypointForm from "~/components/WaypointForm.vue";
+import WaypointsTable from "~/components/WaypointsTable.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -35,6 +50,17 @@ const orderStore = useOrderStore();
 const id = computed(() => Number(route.params.id));
 const order = ref<Order | null>(null);
 const loading = ref(true);
+
+// Watch for changes in the store to keep the local order in sync
+watch(
+  () => orderStore.getOrderById(id.value),
+  (updatedOrder) => {
+    if (updatedOrder) {
+      order.value = { ...updatedOrder };
+    }
+  },
+  { deep: true }
+);
 
 onMounted(async () => {
   loading.value = true;
@@ -52,9 +78,13 @@ onMounted(async () => {
   loading.value = false;
 });
 
-const handleSubmit = async (formData: UpdateOrderDto) => {
+const handleSubmit = async (formData: Partial<Order>) => {
   try {
-    await orderStore.updateOrder(id.value, formData);
+    // Include the current waypoints when updating
+    await orderStore.updateOrder(id.value, {
+      ...formData,
+      waypoints: order.value?.waypoints || [],
+    });
     router.push("/orders");
   } catch (err) {
     // Error is handled by the store
@@ -63,5 +93,13 @@ const handleSubmit = async (formData: UpdateOrderDto) => {
 
 const handleCancel = () => {
   router.push("/orders");
+};
+
+const handleAddWaypoint = (waypoint: Omit<Waypoint, "id" | "orderId">) => {
+  orderStore.addWaypoint(id.value, waypoint);
+};
+
+const handleRemoveWaypoint = (waypointId: number) => {
+  orderStore.removeWaypoint(id.value, waypointId);
 };
 </script>

@@ -16,15 +16,15 @@
 
 <script setup lang="ts">
 import { useOrderStore } from "~/stores/orderStore";
-import type { CreateOrderDto } from "~/types/order";
+import type { Order } from "~/types/order";
 import OrderForm from "~/components/OrderForm.vue";
 
 const router = useRouter();
 const orderStore = useOrderStore();
 
-const handleSubmit = async (formData: CreateOrderDto) => {
+const handleSubmit = async (formData: Partial<Order>) => {
   try {
-    await orderStore.createOrder(formData);
+    await orderStore.createOrder(formData as Order);
     router.push("/orders");
   } catch (err) {
     // Error is handled by the store

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import type { Order, CreateOrderDto, UpdateOrderDto } from "~/types/order";
+import type { Order } from "~/types/order";
+import type { Waypoint, WaypointType } from "~/types/waypoint";
 
 export const useOrderStore = defineStore("order", {
   state: () => ({
@@ -35,7 +36,7 @@ export const useOrderStore = defineStore("order", {
       }
     },
 
-    async createOrder(orderData: CreateOrderDto) {
+    async createOrder(orderData: Order) {
       this.loading = true;
       this.error = null;
       try {
@@ -53,7 +54,7 @@ export const useOrderStore = defineStore("order", {
       }
     },
 
-    async updateOrder(id: number, orderData: UpdateOrderDto) {
+    async updateOrder(id: number, orderData: Partial<Order>) {
       this.loading = true;
       this.error = null;
       try {
@@ -90,6 +91,34 @@ export const useOrderStore = defineStore("order", {
         throw err;
       } finally {
         this.loading = false;
+      }
+    },
+
+    // In-memory waypoint manipulation (no API calls)
+    addWaypoint(orderId: number, waypoint: Omit<Waypoint, "id" | "orderId">) {
+      const order = this.orders.find((o) => o.id === orderId);
+      if (order) {
+        if (!order.waypoints) {
+          order.waypoints = [];
+        }
+        // Generate a temporary ID for the waypoint
+        const maxId =
+          order.waypoints.length > 0
+            ? Math.max(...order.waypoints.map((w) => w.id || 0))
+            : 0;
+        const newWaypoint: Waypoint = {
+          id: maxId + 1,
+          orderId,
+          ...waypoint,
+        };
+        order.waypoints.push(newWaypoint);
+      }
+    },
+
+    removeWaypoint(orderId: number, waypointId: number) {
+      const order = this.orders.find((o) => o.id === orderId);
+      if (order && order.waypoints) {
+        order.waypoints = order.waypoints.filter((w) => w.id !== waypointId);
       }
     },
   },

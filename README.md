@@ -77,3 +77,19 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 ---
 
 The structure follows json-server conventions, so when you query an order with \_embed=waypoints, it will automatically include the related waypoints. You can also query waypoints directly at /waypoints or filter by order like /waypoints?orderId=2.
+
+```
+GET    /orders                    # List all orders
+GET    /orders/:orderId           # Get single order (with embedded waypoints)
+POST   /orders                    # Create order (optionally with waypoints)
+PUT    /orders/:orderId           # Update order
+PATCH  /orders/:orderId           # Partial update order
+DELETE /orders/:orderId           # Delete order (cascade delete waypoints)
+
+GET    /orders/:orderId/waypoints              # List waypoints for an order
+GET    /orders/:orderId/waypoints/:waypointId  # Get single waypoint
+POST   /orders/:orderId/waypoints              # Create waypoint for order
+PUT    /orders/:orderId/waypoints/:waypointId  # Update waypoint
+PATCH  /orders/:orderId/waypoints/:waypointId  # Partial update waypoint
+DELETE /orders/:orderId/waypoints/:waypointId  # Delete waypoint
+```
