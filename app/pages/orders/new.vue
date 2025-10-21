@@ -10,11 +10,7 @@
       {{ orderStore.error }}
     </v-alert>
 
-    <OrderForm
-      :loading="orderStore.loading"
-      @submit="handleSubmit"
-      @cancel="handleCancel"
-    />
+    <OrderForm @submit="handleSubmit" @cancel="handleCancel" />
   </v-container>
 </template>
 

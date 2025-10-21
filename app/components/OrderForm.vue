@@ -34,13 +34,8 @@
 
         <v-row>
           <v-col>
-            <v-btn
-              type="submit"
-              color="primary"
-              class="mr-2"
-              :loading="loading"
-            >
-              {{ initialData ? "Update Order" : "Create Order" }}
+            <v-btn type="submit" color="primary" class="mr-2">
+              {{ order ? "Update Order" : "Create Order" }}
             </v-btn>
             <v-btn @click="$emit('cancel')"> Cancel </v-btn>
           </v-col>
@@ -55,13 +50,11 @@ import moment from "moment";
 import type { Order } from "~/types/order";
 
 interface Props {
-  initialData?: Order;
-  loading?: boolean;
+  order?: Order;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  initialData: undefined,
-  loading: false,
+  order: undefined,
 });
 
 const emit = defineEmits<{
@@ -70,14 +63,14 @@ const emit = defineEmits<{
 }>();
 
 const form = ref({
-  number: props.initialData?.number || "",
-  customerName: props.initialData?.customerName || "",
-  date: props.initialData?.date || moment().format("YYYY-MM-DD"),
+  number: props.order?.number || "",
+  customerName: props.order?.customerName || "",
+  date: props.order?.date || moment().format("YYYY-MM-DD"),
 });
 
-// Watch for changes in initialData (useful if it loads async)
+// Watch for changes in order (useful if it loads async)
 watch(
-  () => props.initialData,
+  () => props.order,
   (newData) => {
     if (newData) {
       form.value = {

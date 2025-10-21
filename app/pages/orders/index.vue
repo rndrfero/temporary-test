@@ -23,10 +23,12 @@
       {{ orderStore.error }}
     </v-alert>
 
-    <v-data-table
+    <v-data-table-server
       :headers="headers"
       :items="orderStore.orders"
-      :items-per-page="2"
+      :items-length="orderStore.totalCount"
+      :loading="orderStore.loading"
+      @update:options="loadOrders"
     >
       <template #item.date="{ item }">
         {{ formatDate(item.date) }}
@@ -44,7 +46,7 @@
           @click="deleteOrder(item.id!)"
         />
       </template>
-    </v-data-table>
+    </v-data-table-server>
   </v-container>
 </template>
 
@@ -61,9 +63,9 @@ const headers = [
   { title: "Actions", key: "actions", sortable: false },
 ];
 
-onMounted(() => {
-  orderStore.fetchOrders();
-});
+const loadOrders = (options: any) => {
+  orderStore.fetchOrders(options.page, options.itemsPerPage);
+};
 
 const deleteOrder = async (id: number) => {
   if (confirm("Delete this order?")) {

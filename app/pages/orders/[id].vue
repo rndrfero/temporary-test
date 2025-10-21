@@ -16,8 +16,7 @@
 
     <OrderForm
       v-if="order"
-      :initial-data="order"
-      :loading="orderStore.loading"
+      :order="order"
       @submit="handleSubmit"
       @cancel="handleCancel"
     />

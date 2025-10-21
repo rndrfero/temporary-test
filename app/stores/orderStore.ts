@@ -6,6 +6,7 @@ export const useOrderStore = defineStore("order", {
     orders: [] as Order[],
     loading: false,
     error: null as string | null,
+    totalCount: 0,
   }),
 
   getters: {
@@ -16,12 +17,17 @@ export const useOrderStore = defineStore("order", {
   },
 
   actions: {
-    async fetchOrders() {
+    async fetchOrders(page = 1, limit = 10) {
       this.loading = true;
       this.error = null;
       try {
-        const data = await $fetch<Order[]>("http://localhost:3001/orders");
-        this.orders = data;
+        const response = await fetch(
+          `http://localhost:3001/orders?_page=${page}&_limit=${limit}`
+        );
+        this.totalCount = parseInt(
+          response.headers.get("x-total-count") || "0"
+        );
+        this.orders = await response.json();
       } catch (err: any) {
         this.error = err.message || "Failed to fetch orders";
       } finally {
