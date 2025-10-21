@@ -73,3 +73,7 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+---
+
+The structure follows json-server conventions, so when you query an order with \_embed=waypoints, it will automatically include the related waypoints. You can also query waypoints directly at /waypoints or filter by order like /waypoints?orderId=2.
