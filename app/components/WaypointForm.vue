@@ -62,11 +62,9 @@ const createInitialFormState = (): WaypointFormData => ({
 const form = ref<WaypointFormData>(createInitialFormState());
 
 const handleSubmit = async () => {
-  if (!formRef.value) return;
+  const result = await formRef.value?.validate();
 
-  const { valid } = await formRef.value.validate();
-
-  if (valid) {
+  if (result?.valid) {
     emit("submit", form.value);
     resetForm();
   }

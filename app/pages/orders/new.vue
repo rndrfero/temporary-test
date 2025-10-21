@@ -26,35 +26,25 @@ import OrderForm from "~/components/OrderForm.vue";
 const router = useRouter();
 const orderStore = useOrderRecordStore();
 
-// Initialize empty order for creation
 onMounted(() => {
+  const todayDate = new Date().toISOString().split("T")[0];
   orderStore.initializeOrder({
-    number: "",
-    customerName: "",
-    date: new Date().toISOString().split("T")[0],
-    waypoints: [],
+    date: todayDate,
   });
 });
 
-// Clear order when leaving
 onUnmounted(() => {
   orderStore.clearOrder();
 });
 
 const handleSubmit = async (formData: Partial<Order>) => {
-  try {
-    const newOrder = await orderStore.createOrder(formData as Order);
-    if (newOrder?.id) {
-      // Navigate to edit page for the newly created order
-      router.push(`/orders/${newOrder.id}`);
-    }
-  } catch (err) {
-    // Error is handled by the store
+  const newOrder = await orderStore.createOrder(formData as Order);
+  if (newOrder && newOrder.id) {
+    router.push(`/orders/${newOrder.id}`);
   }
 };
 
 const handleCancel = () => {
-  orderStore.clearOrder();
   router.push("/orders");
 };
 </script>

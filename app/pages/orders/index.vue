@@ -42,7 +42,7 @@
           size="small"
           icon="mdi-delete"
           color="error"
-          @click="deleteOrder(item.id!)"
+          @click="item.id && deleteOrder(item.id)"
         />
       </template>
     </v-data-table-server>
@@ -51,6 +51,11 @@
 
 <script setup lang="ts">
 import { useOrderCollectionStore } from "~/stores/orderCollectionStore";
+
+interface DataTableOptions {
+  page: number;
+  itemsPerPage: number;
+}
 
 const orderStore = useOrderCollectionStore();
 
@@ -62,9 +67,12 @@ const headers = [
   { title: "Actions", key: "actions", sortable: false },
 ];
 
-const currentOptions = ref<any>(null);
+const currentOptions = ref<DataTableOptions>({
+  page: 1,
+  itemsPerPage: 10,
+});
 
-const loadOrders = (options: any) => {
+const loadOrders = (options: DataTableOptions) => {
   currentOptions.value = options;
   orderStore.fetchOrders(options.page, options.itemsPerPage);
 };
@@ -73,20 +81,18 @@ const deleteOrder = async (id: number) => {
   if (confirm("Delete this order?")) {
     await orderStore.deleteOrder(id);
     // Refresh to maintain correct pagination/count
-    if (currentOptions.value) {
-      orderStore.fetchOrders(
-        currentOptions.value.page,
-        currentOptions.value.itemsPerPage
-      );
-    }
+    orderStore.fetchOrders(
+      currentOptions.value.page,
+      currentOptions.value.itemsPerPage
+    );
   }
 };
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric', 
-    year: 'numeric' 
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 };
 </script>

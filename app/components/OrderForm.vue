@@ -96,8 +96,9 @@ const handleRemoveWaypoint = (index: number) => {
 };
 
 const handleSubmit = async () => {
-  const { valid } = await formRef.value!.validate();
+  if (!formRef.value) return;
 
+  const { valid } = await formRef.value.validate();
   if (valid && orderStore.order) {
     emit("submit", orderStore.order);
   }

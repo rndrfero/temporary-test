@@ -44,16 +44,10 @@ onUnmounted(() => {
 });
 
 const handleSubmit = async (formData: Partial<Order>) => {
-  try {
-    await orderStore.updateOrder(id.value, formData);
-    // Stay on the edit page after updating
-  } catch (err) {
-    // Error is handled by the store
-  }
+  await orderStore.updateOrder(id.value, formData);
 };
 
 const handleCancel = () => {
-  orderStore.clearOrder();
   router.push("/orders");
 };
 </script>

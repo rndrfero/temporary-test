@@ -36,25 +36,27 @@ export const useOrderRecordStore = defineStore("orderRecord", () => {
 
   // Actions - Waypoint manipulation (in-memory, works on order)
   function addWaypoint(waypoint: Omit<Waypoint, "id" | "orderId">) {
-    order.value!.waypoints.push({
+    if (!order.value) return;
+    order.value.waypoints.push({
       ...waypoint,
-      orderId: order.value!.id,
+      orderId: order.value.id,
     });
   }
 
   function removeWaypointAtIndex(index: number) {
-    order.value!.waypoints.splice(index, 1);
+    if (!order.value) return;
+    order.value.waypoints.splice(index, 1);
   }
 
   function initializeOrder(orderData?: Partial<Order>) {
-    order.value = {
+    const defaults: Order = {
       id: undefined,
       number: "",
       customerName: "",
       date: "",
       waypoints: [],
-      ...orderData,
-    } as Order;
+    };
+    order.value = { ...defaults, ...orderData } as Order;
     error.value = null;
   }
 
