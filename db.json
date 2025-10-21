@@ -24,7 +24,7 @@
       "id": 3,
       "number": "ORD-2025-003",
       "customerName": "Global Enterprises",
-      "date": "2025-10-17",
+      "date": "2025-10-24",
       "waypoints": [
         {
           "id": 4,
@@ -43,6 +43,12 @@
           "orderId": 3,
           "address": "987 Cedar Ln, Pasadena, CA 91101",
           "type": "Delivery"
+        },
+        {
+          "address": "sadfasdfsdf",
+          "type": "Delivery",
+          "id": 1761064571250,
+          "orderId": 3
         }
       ]
     },

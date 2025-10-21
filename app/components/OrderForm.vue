@@ -36,6 +36,23 @@
 
         <v-divider class="my-4" />
 
+        <v-row class="mt-4">
+          <v-col>
+            <WaypointsTable
+              :order="{ waypoints } as any"
+              @remove="handleRemoveWaypoint"
+            />
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col>
+            <WaypointForm @submit="handleAddWaypoint" />
+          </v-col>
+        </v-row>
+
+        <v-divider class="my-4" />
+
         <v-row>
           <v-col>
             <v-btn type="submit" color="primary" class="mr-2">
@@ -52,7 +69,10 @@
 <script setup lang="ts">
 import moment from "moment";
 import type { Order } from "~/types/order";
+import type { Waypoint } from "~/types/waypoint";
 import type { VForm } from "vuetify/components";
+import WaypointForm from "~/components/WaypointForm.vue";
+import WaypointsTable from "~/components/WaypointsTable.vue";
 
 interface Props {
   order?: Order;
@@ -76,6 +96,8 @@ const form = ref({
   date: props.order?.date || moment().format("YYYY-MM-DD"),
 });
 
+const waypoints = ref<Waypoint[]>(props.order?.waypoints || []);
+
 // Watch for changes in order (useful if it loads async)
 watch(
   () => props.order,
@@ -86,16 +108,29 @@ watch(
         customerName: newData.customerName,
         date: newData.date,
       };
+      waypoints.value = newData.waypoints || [];
     }
   },
   { immediate: true }
 );
 
+const handleAddWaypoint = (waypoint: Omit<Waypoint, "id" | "orderId">) => {
+  waypoints.value.push({
+    ...waypoint,
+    id: Date.now(),
+    orderId: props.order?.id || 0,
+  });
+};
+
+const handleRemoveWaypoint = (waypointId: number) => {
+  waypoints.value = waypoints.value.filter((w) => w.id !== waypointId);
+};
+
 const handleSubmit = async () => {
   const { valid } = await formRef.value!.validate();
 
   if (valid) {
-    emit("submit", { ...form.value });
+    emit("submit", { ...form.value, waypoints: waypoints.value });
   }
 };
 </script>

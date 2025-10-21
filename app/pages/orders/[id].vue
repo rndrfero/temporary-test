@@ -20,28 +20,13 @@
       @submit="handleSubmit"
       @cancel="handleCancel"
     />
-
-    <v-row v-if="order" class="mt-6">
-      <v-col>
-        <WaypointForm @submit="handleAddWaypoint" />
-      </v-col>
-    </v-row>
-
-    <v-row v-if="order" class="mt-4">
-      <v-col>
-        <WaypointsTable :order="order" @remove="handleRemoveWaypoint" />
-      </v-col>
-    </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { useOrderStore } from "~/stores/orderStore";
 import type { Order } from "~/types/order";
-import type { Waypoint } from "~/types/waypoint";
 import OrderForm from "~/components/OrderForm.vue";
-import WaypointForm from "~/components/WaypointForm.vue";
-import WaypointsTable from "~/components/WaypointsTable.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -80,11 +65,7 @@ onMounted(async () => {
 
 const handleSubmit = async (formData: Partial<Order>) => {
   try {
-    // Include the current waypoints when updating
-    await orderStore.updateOrder(id.value, {
-      ...formData,
-      waypoints: order.value?.waypoints || [],
-    });
+    await orderStore.updateOrder(id.value, formData);
     router.push("/orders");
   } catch (err) {
     // Error is handled by the store
@@ -93,13 +74,5 @@ const handleSubmit = async (formData: Partial<Order>) => {
 
 const handleCancel = () => {
   router.push("/orders");
-};
-
-const handleAddWaypoint = (waypoint: Omit<Waypoint, "id" | "orderId">) => {
-  orderStore.addWaypoint(id.value, waypoint);
-};
-
-const handleRemoveWaypoint = (waypointId: number) => {
-  orderStore.removeWaypoint(id.value, waypointId);
 };
 </script>
