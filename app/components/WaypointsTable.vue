@@ -12,10 +12,7 @@
     </template>
 
     <template #[`item.type`]="{ item }">
-      <v-chip
-        :color="item.type === 'Pickup' ? 'primary' : 'success'"
-        size="small"
-      >
+      <v-chip :color="getWaypointColor(item.type)" size="small">
         {{ item.type }}
       </v-chip>
     </template>
@@ -45,23 +42,22 @@ interface Props {
   order?: Order;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  order: undefined,
-});
+defineProps<Props>();
 
-const emit = defineEmits<{
+defineEmits<{
   remove: [index: number];
 }>();
 
+const getWaypointColor = (type: string) =>
+  type === "Pickup" ? "primary" : "success";
+
 const headers = [
-  { title: "ID", key: "id", align: "start" as const },
-  { title: "Type", key: "type", align: "start" as const },
-  { title: "Address", key: "address", align: "start" as const },
+  { title: "Type", key: "type" },
+  { title: "Address", key: "address" },
   {
     title: "Actions",
     key: "actions",
-    align: "center" as const,
     sortable: false,
   },
-];
+] as const;
 </script>
