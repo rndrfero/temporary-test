@@ -15,10 +15,6 @@
       </v-col>
     </v-row>
 
-    <v-alert v-if="orderStore.loading" type="info" class="mb-4">
-      Loading...
-    </v-alert>
-
     <v-alert v-if="orderStore.error" type="error" class="mb-4">
       {{ orderStore.error }}
     </v-alert>
