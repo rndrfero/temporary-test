@@ -73,6 +73,9 @@ const currentOptions = ref<DataTableOptions>({
   itemsPerPage: 10,
 });
 
+// Fetch initial data during SSR
+await orderStore.fetchOrders(currentOptions.value);
+
 const loadOrders = (options: DataTableOptions) => {
   currentOptions.value = options;
   orderStore.fetchOrders(options);

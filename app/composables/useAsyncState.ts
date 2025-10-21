@@ -16,8 +16,8 @@ export function useAsyncState() {
   }
 
   return {
-    loading: readonly(loading),
-    error, // Keep error writable so stores can manually clear it
+    loading,
+    error,
     withLoadingAndError,
   };
 }
