@@ -232,26 +232,6 @@
       "id": 14
     },
     {
-      "number": "asdfa",
-      "customerName": "asdfasfd",
-      "date": "2025-10-21",
-      "waypoints": [
-        {
-          "id": 1,
-          "orderId": 0,
-          "address": "asdfasdf",
-          "type": "Pickup"
-        },
-        {
-          "id": 2,
-          "orderId": 0,
-          "address": "asdfasdfasdf",
-          "type": "Delivery"
-        }
-      ],
-      "id": 15
-    },
-    {
       "number": "1234123412341234",
       "customerName": "123412341234123",
       "date": "2025-10-21",
