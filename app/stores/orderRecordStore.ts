@@ -1,94 +1,80 @@
 import { defineStore } from "pinia";
 import type { Order } from "~/types/order";
 import type { Waypoint } from "~/types/waypoint";
+import { orderApi } from "~/services/orderApi";
+import { useAsyncState } from "~/composables/useAsyncState";
 
-export const useOrderRecordStore = defineStore("orderRecord", {
-  state: () => ({
-    order: undefined as Order | undefined,
-    loading: false,
-    error: null as string | null,
-  }),
+export const useOrderRecordStore = defineStore("orderRecord", () => {
+  // Domain-specific state
+  const order = ref<Order | undefined>(undefined);
 
-  actions: {
-    async fetchOrder(id: number) {
-      this.loading = true;
-      this.error = null;
-      try {
-        this.order = await $fetch<Order>(`http://localhost:3001/orders/${id}`);
-      } catch (err: any) {
-        this.error = err.message || "Failed to fetch order";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
+  // Shared async state
+  const { loading, error, withLoadingAndError } = useAsyncState();
 
-    async createOrder(orderData: Order) {
-      this.loading = true;
-      this.error = null;
-      try {
-        const newOrder = await $fetch<Order>("http://localhost:3001/orders", {
-          method: "POST",
-          body: orderData,
-        });
-        this.order = newOrder;
-        return newOrder;
-      } catch (err: any) {
-        this.error = err.message || "Failed to create order";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
+  // Actions - API calls
+  async function fetchOrder(id: number) {
+    return withLoadingAndError(async () => {
+      order.value = await orderApi.getOrder(id);
+    });
+  }
 
-    async updateOrder(id: number, orderData: Partial<Order>) {
-      this.loading = true;
-      this.error = null;
-      try {
-        const updatedOrder = await $fetch<Order>(
-          `http://localhost:3001/orders/${id}`,
-          {
-            method: "PATCH",
-            body: orderData,
-          }
-        );
-        this.order = updatedOrder;
-        return updatedOrder;
-      } catch (err: any) {
-        this.error = err.message || "Failed to update order";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
+  async function createOrder(orderData: Order) {
+    return withLoadingAndError(async () => {
+      const newOrder = await orderApi.createOrder(orderData);
+      order.value = newOrder;
+      return newOrder;
+    });
+  }
 
-    // Waypoint manipulation (in-memory, works on this.order)
-    addWaypoint(waypoint: Omit<Waypoint, "id" | "orderId">) {
-      this.order!.waypoints.push({
-        ...waypoint,
-        orderId: this.order!.id,
-      });
-    },
+  async function updateOrder(id: number, orderData: Partial<Order>) {
+    return withLoadingAndError(async () => {
+      const updatedOrder = await orderApi.updateOrder(id, orderData);
+      order.value = updatedOrder;
+      return updatedOrder;
+    });
+  }
 
-    removeWaypointAtIndex(index: number) {
-      this.order!.waypoints.splice(index, 1);
-    },
+  // Actions - Waypoint manipulation (in-memory, works on order)
+  function addWaypoint(waypoint: Omit<Waypoint, "id" | "orderId">) {
+    order.value!.waypoints.push({
+      ...waypoint,
+      orderId: order.value!.id,
+    });
+  }
 
-    initializeOrder(orderData?: Partial<Order>) {
-      this.order = {
-        id: undefined,
-        number: "",
-        customerName: "",
-        date: "",
-        waypoints: [],
-        ...orderData,
-      } as Order;
-      this.error = null;
-    },
+  function removeWaypointAtIndex(index: number) {
+    order.value!.waypoints.splice(index, 1);
+  }
 
-    clearOrder() {
-      this.order = undefined;
-      this.error = null;
-    },
-  },
+  function initializeOrder(orderData?: Partial<Order>) {
+    order.value = {
+      id: undefined,
+      number: "",
+      customerName: "",
+      date: "",
+      waypoints: [],
+      ...orderData,
+    } as Order;
+    error.value = null;
+  }
+
+  function clearOrder() {
+    order.value = undefined;
+    error.value = null;
+  }
+
+  return {
+    // State
+    order,
+    loading,
+    error,
+    // Actions
+    fetchOrder,
+    createOrder,
+    updateOrder,
+    addWaypoint,
+    removeWaypointAtIndex,
+    initializeOrder,
+    clearOrder,
+  };
 });

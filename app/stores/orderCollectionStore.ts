@@ -1,53 +1,47 @@
 import { defineStore } from "pinia";
 import type { Order } from "~/types/order";
+import { orderApi } from "~/services/orderApi";
+import { useAsyncState } from "~/composables/useAsyncState";
 
-export const useOrderCollectionStore = defineStore("orderCollection", {
-  state: () => ({
-    orders: [] as Order[],
-    totalCount: 0,
-    loading: false,
-    error: null as string | null,
-  }),
+export const useOrderCollectionStore = defineStore("orderCollection", () => {
+  // Domain-specific state
+  const orders = ref<Order[]>([]);
+  const totalCount = ref(0);
 
-  getters: {
-    totalOrders: (state) => state.orders.length,
-  },
+  // Shared async state
+  const { loading, error, withLoadingAndError } = useAsyncState();
 
-  actions: {
-    async fetchOrders(page = 1, limit = 10) {
-      console.log("** fetchOrders", page, limit);
-      this.loading = true;
-      this.error = null;
-      try {
-        const response = await fetch(
-          `http://localhost:3001/orders?_page=${page}&_limit=${limit}`
-        );
-        this.totalCount = parseInt(
-          response.headers.get("x-total-count") || "0"
-        );
-        this.orders = await response.json();
-      } catch (err: any) {
-        this.error = err.message || "Failed to fetch orders";
-      } finally {
-        this.loading = false;
-      }
-    },
+  // Getters
+  const totalOrders = computed(() => orders.value.length);
 
-    async deleteOrder(id: number) {
-      this.loading = true;
-      this.error = null;
-      try {
-        await $fetch(`http://localhost:3001/orders/${id}`, {
-          method: "DELETE",
-        });
-        this.orders = this.orders.filter((order) => order.id !== id);
-        this.totalCount = Math.max(0, this.totalCount - 1);
-      } catch (err: any) {
-        this.error = err.message || "Failed to delete order";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-  },
+  // Actions
+  async function fetchOrders(page = 1, limit = 10) {
+    console.log("** fetchOrders", page, limit);
+    return withLoadingAndError(async () => {
+      const result = await orderApi.getOrders(page, limit);
+      orders.value = result.orders;
+      totalCount.value = result.totalCount;
+    });
+  }
+
+  async function deleteOrder(id: number) {
+    return withLoadingAndError(async () => {
+      await orderApi.deleteOrder(id);
+      orders.value = orders.value.filter((order) => order.id !== id);
+      totalCount.value = Math.max(0, totalCount.value - 1);
+    });
+  }
+
+  return {
+    // State
+    orders,
+    totalCount,
+    loading,
+    error,
+    // Getters
+    totalOrders,
+    // Actions
+    fetchOrders,
+    deleteOrder,
+  };
 });
