@@ -8,7 +8,7 @@
             <v-select
               v-model="form.type"
               label="Type"
-              :items="waypointTypes"
+              :items="WAYPOINT_TYPES"
               variant="outlined"
               :rules="[rules.required]"
             />
@@ -41,43 +41,39 @@
 </template>
 
 <script setup lang="ts">
-import type { WaypointType } from "~/types/waypoint";
+import type { Waypoint } from "~/types/waypoint";
+import { WAYPOINT_TYPES } from "~/types/waypoint";
 import type { VForm } from "vuetify/components";
 
+type WaypointFormData = Omit<Waypoint, "id" | "orderId">;
+
 const emit = defineEmits<{
-  submit: [data: { address: string; type: WaypointType }];
+  submit: [data: WaypointFormData];
 }>();
 
 const formRef = ref<VForm | null>(null);
 const rules = useValidationRules();
 
-const waypointTypes: WaypointType[] = ["Pickup", "Delivery"];
-
-const form = ref<{
-  address: string;
-  type: WaypointType | null;
-}>({
+const createInitialFormState = (): WaypointFormData => ({
   address: "",
-  type: null,
+  type: "Pickup",
 });
 
-const handleSubmit = async () => {
-  const { valid } = await formRef.value!.validate();
+const form = ref<WaypointFormData>(createInitialFormState());
 
-  if (valid && form.value.type) {
-    emit("submit", {
-      address: form.value.address,
-      type: form.value.type,
-    });
+const handleSubmit = async () => {
+  if (!formRef.value) return;
+
+  const { valid } = await formRef.value.validate();
+
+  if (valid) {
+    emit("submit", form.value);
     resetForm();
   }
 };
 
 const resetForm = () => {
-  form.value = {
-    address: "",
-    type: null,
-  };
+  form.value = createInitialFormState();
   formRef.value?.resetValidation();
 };
 </script>
