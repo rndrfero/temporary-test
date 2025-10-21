@@ -51,9 +51,9 @@
 
 <script setup lang="ts">
 import moment from "moment";
-import { useOrderStore } from "~/stores/orderStore";
+import { useOrderCollectionStore } from "~/stores/orderCollectionStore";
 
-const orderStore = useOrderStore();
+const orderStore = useOrderCollectionStore();
 
 const headers = [
   { title: "Order Number", key: "number" },
@@ -63,13 +63,23 @@ const headers = [
   { title: "Actions", key: "actions", sortable: false },
 ];
 
+const currentOptions = ref<any>(null);
+
 const loadOrders = (options: any) => {
+  currentOptions.value = options;
   orderStore.fetchOrders(options.page, options.itemsPerPage);
 };
 
 const deleteOrder = async (id: number) => {
   if (confirm("Delete this order?")) {
     await orderStore.deleteOrder(id);
+    // Refresh to maintain correct pagination/count
+    if (currentOptions.value) {
+      orderStore.fetchOrders(
+        currentOptions.value.page,
+        currentOptions.value.itemsPerPage
+      );
+    }
   }
 };
 

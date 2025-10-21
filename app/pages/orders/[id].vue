@@ -2,11 +2,13 @@
   <v-container>
     <v-row class="mb-4">
       <v-col>
-        <h1 class="text-h4">Edit Order #{{ order?.number || id }}</h1>
+        <h1 class="text-h4">
+          Edit Order #{{ orderStore.order?.number || id }}
+        </h1>
       </v-col>
     </v-row>
 
-    <v-alert v-if="loading" type="info" class="mb-4">
+    <v-alert v-if="orderStore.loading" type="info" class="mb-4">
       Loading order...
     </v-alert>
 
@@ -15,8 +17,7 @@
     </v-alert>
 
     <OrderForm
-      v-if="order"
-      :order="order"
+      v-if="orderStore.order"
       @submit="handleSubmit"
       @cancel="handleCancel"
     />
@@ -24,55 +25,35 @@
 </template>
 
 <script setup lang="ts">
-import { useOrderStore } from "~/stores/orderStore";
+import { useOrderRecordStore } from "~/stores/orderRecordStore";
 import type { Order } from "~/types/order";
 import OrderForm from "~/components/OrderForm.vue";
 
 const route = useRoute();
 const router = useRouter();
-const orderStore = useOrderStore();
+const orderStore = useOrderRecordStore();
 
 const id = computed(() => Number(route.params.id));
-const order = ref<Order | null>(null);
-const loading = ref(true);
-
-// Watch for changes in the store to keep the local order in sync
-watch(
-  () => orderStore.getOrderById(id.value),
-  (updatedOrder) => {
-    if (updatedOrder) {
-      order.value = { ...updatedOrder };
-    }
-  },
-  { deep: true }
-);
 
 onMounted(async () => {
-  loading.value = true;
-  // Ensure orders are loaded
-  if (orderStore.orders.length === 0) {
-    await orderStore.fetchOrders();
-  }
+  await orderStore.fetchOrder(id.value);
+});
 
-  const foundOrder = orderStore.getOrderById(id.value);
-  if (foundOrder) {
-    order.value = { ...foundOrder };
-  } else {
-    orderStore.error = "Order not found";
-  }
-  loading.value = false;
+onUnmounted(() => {
+  orderStore.clearOrder();
 });
 
 const handleSubmit = async (formData: Partial<Order>) => {
   try {
     await orderStore.updateOrder(id.value, formData);
-    router.push("/orders");
+    // Stay on the edit page after updating
   } catch (err) {
     // Error is handled by the store
   }
 };
 
 const handleCancel = () => {
+  orderStore.clearOrder();
   router.push("/orders");
 };
 </script>
